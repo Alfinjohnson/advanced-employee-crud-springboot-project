@@ -1,18 +1,20 @@
 package com.example.employeecrud.utility;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Const {
+@Slf4j(topic = "const class")
+public class APPConst {
     @NonNull
     public static String getCurrentTime() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return now.format(formatter);
     }
-    public static boolean isAlphabetical(@NonNull String input) {
+    public static boolean isAlphabetical( String input) {
         return input.matches("[a-zA-Z]+");
     }
     public static boolean isNonZeroPositiveNumber(String input) {
@@ -33,7 +35,7 @@ public class Const {
     }
 
 
-    public static boolean isValidEmail(@NonNull String input) {
+    public static boolean isValidEmail( String input) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
         return input.matches(emailRegex);
     }
@@ -43,19 +45,19 @@ public class Const {
     public static boolean isArrayNullOrEmpty(Object[] array) {
         return array == null || array.length == 0;
     }
-    public static boolean isArrayOfStringsAlphabetic(@NonNull String[] array) {
-        for (String str : array)
-            if (!isAlphabeticWithDot(str)) {
-                return false;
-            }
-        return true;
+    public static boolean isArrayOfStringsAlphabetic( String[] array) {
+            for (String str : array)
+                if (!isAlphabeticWithDot(str)) {
+                    return false;
+                }
+            return true;
     }
 
-    public static boolean isAlphabeticWithDot(@NonNull String str) {
+    public static boolean isAlphabeticWithDot( String str) {
         return str.matches("[a-zA-Z].+");
     }
 
-    public static boolean isAlphabeticWithSpace(@NonNull String str) {
+    public static boolean isAlphabeticWithSpace( String str) {
         return str.matches("[a-zA-Z ]+");
     }
 
@@ -68,7 +70,7 @@ public class Const {
         }
     }
 
-    public static boolean isValidAlphaNumeric(@NonNull String str) {
+    public static boolean isValidAlphaNumeric( String str) {
         return str.matches("[a-zA-Z0-9\\-]+");
     }
 

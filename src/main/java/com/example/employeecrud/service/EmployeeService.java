@@ -2,8 +2,10 @@ package com.example.employeecrud.service;
 
 import com.example.employeecrud.entity.Employee;
 import com.example.employeecrud.payload.request.CreateEmployeeRequest;
+import com.example.employeecrud.payload.request.UpdateEmployeeRequest;
 import com.example.employeecrud.payload.response.CreateEmployeeResponse;
 import com.example.employeecrud.payload.response.GetEmployeeResponse;
+import com.example.employeecrud.payload.response.UpdateEmployeeResponse;
 import com.example.employeecrud.repository.EmployeeRepository;
 import com.example.employeecrud.utility.expectionHandler.CustomException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,8 @@ import org.modelmapper.ModelMapper;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.example.employeecrud.utility.APPConst.*;
 
 @Service
 @Slf4j(topic = "EmployeeService")
@@ -100,4 +104,38 @@ public class EmployeeService {
         return employeeRepository.existsByEmail(email);
     }
 
+    public UpdateEmployeeResponse updateEmployee(String employeeId, UpdateEmployeeRequest newUpdateEmployeeDTO) {
+        log.info("inside updateEmployee service");
+        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
+
+        if (optionalEmployee.isPresent()) {
+            Employee existingEmployee = optionalEmployee.get();
+
+
+            if (!isStringNullOrEmptyOrBlank(newUpdateEmployeeDTO.getEmployeeName())){
+                existingEmployee.setEmployeeName(newUpdateEmployeeDTO.getEmployeeName());
+            }
+
+            if (!isStringNullOrEmptyOrBlank(newUpdateEmployeeDTO.getAge())){
+                existingEmployee.setAge(newUpdateEmployeeDTO.getAge());
+            }
+            if (!isStringNullOrEmptyOrBlank(newUpdateEmployeeDTO.getEmail())){
+                existingEmployee.setEmail(newUpdateEmployeeDTO.getEmail());
+            }
+
+            if (!isStringNullOrEmptyOrBlank(newUpdateEmployeeDTO.getSalaryAmount())){
+                existingEmployee.setSalaryAmount(newUpdateEmployeeDTO.getSalaryAmount());
+            }
+            if (!isArrayNullOrEmpty(newUpdateEmployeeDTO.getDegreeDetails())){
+                existingEmployee.setDegreeDetails(newUpdateEmployeeDTO.getDegreeDetails());
+            }
+
+            Employee updateEmployee = employeeRepository.save(existingEmployee);
+            UpdateEmployeeResponse getEmployeeResponse = modelMapper.map(updateEmployee, UpdateEmployeeResponse.class);
+
+            // Save the updated employee to the database
+            return getEmployeeResponse;
+        } else throw new CustomException(HttpStatus.NOT_FOUND,"no record found with employeeId: "+employeeId);
+
+    }
 }

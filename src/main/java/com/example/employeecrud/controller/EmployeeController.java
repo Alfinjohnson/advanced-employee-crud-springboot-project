@@ -1,9 +1,10 @@
 package com.example.employeecrud.controller;
 
-import com.example.employeecrud.entity.Employee;
 import com.example.employeecrud.payload.request.CreateEmployeeRequest;
+import com.example.employeecrud.payload.request.UpdateEmployeeRequest;
 import com.example.employeecrud.payload.response.CreateEmployeeResponse;
 import com.example.employeecrud.payload.response.GetEmployeeResponse;
+import com.example.employeecrud.payload.response.UpdateEmployeeResponse;
 import com.example.employeecrud.service.EmployeeService;
 import com.example.employeecrud.utility.ApiResponse;
 import com.example.employeecrud.utility.expectionHandler.CustomException;
@@ -15,10 +16,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.example.employeecrud.helper.InputValidation.createEmployeeRequestValidationMethod;
-import static com.example.employeecrud.utility.Const.*;
+import static com.example.employeecrud.helper.InputValidation.updateEmployeeRequestValidationMethod;
+import static com.example.employeecrud.utility.APPConst.*;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -45,6 +46,10 @@ public class EmployeeController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * @param id 
+     * @return GetEmployeeResponse
+     */
     @GetMapping("/{id}")
     private ResponseEntity<ApiResponse<GetEmployeeResponse>> getEmployeeById(@PathVariable String id) {
         log.info("inside get all get employees by id controller");
@@ -71,7 +76,7 @@ public class EmployeeController {
         CreateEmployeeResponse employeeResponse= employeeService.createEmployee(newCreateEmployeeRequest);
         ApiResponse<CreateEmployeeResponse> response = new ApiResponse<>();
         response.setStatusCode(HttpStatus.CREATED.value());
-        response.setMessage("Success");
+        response.setMessage("New Employee Created");
         response.setData(employeeResponse);
         response.setTimestamp(getCurrentTime());
 
@@ -79,18 +84,30 @@ public class EmployeeController {
     }
 
 
-
+    /**
+     * @apiNote update employee method
+     * @param id 
+     * @param updateEmployeeRequest
+     * @return
+     */
     @PutMapping("/{id}")
-    private Optional<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
-       // Optional<Employee> employee = employeeService.findById(id);
-        return null;
+    private ResponseEntity<ApiResponse<UpdateEmployeeResponse>> updateEmployee(@PathVariable String id, @RequestBody UpdateEmployeeRequest updateEmployeeRequest) {
+        log.info("inside update employee controller");
+        UpdateEmployeeRequest newUpdateEmployeeDTO = updateEmployeeRequestValidationMethod(id, updateEmployeeRequest);
+        UpdateEmployeeResponse updateEmployeeResponse = employeeService.updateEmployee(id, newUpdateEmployeeDTO);
+        ApiResponse<UpdateEmployeeResponse> response = new ApiResponse<>();
+        response.setStatusCode(HttpStatus.OK.value());
+        response.setMessage("Employee updated");
+        response.setData(updateEmployeeResponse);
+        response.setTimestamp(getCurrentTime());
+
+        return ResponseEntity.ok(response);
     }
 
+
+
     @DeleteMapping("/{id}")
-    private void deleteEmployee(@PathVariable Long id) {
-        //Employee employee = employeeService.findById(id)
-       //         .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
-       // employeeService.delete(employee);
+    private void deleteEmployee() {
     }
 
 
