@@ -30,6 +30,10 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+
     /**
      * @apiNote  get all employee method
      * */

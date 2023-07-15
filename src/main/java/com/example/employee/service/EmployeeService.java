@@ -9,6 +9,7 @@ import com.example.employee.payload.response.UpdateEmployeeResponse;
 import com.example.employee.repository.EmployeeRepository;
 import com.example.employee.utility.expectionHandler.CustomException;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.JDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,12 @@ public class EmployeeService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    public EmployeeService(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
+        this.employeeRepository = employeeRepository;
+        this.modelMapper = modelMapper;
+    }
+
     public GetEmployeeResponse findById(String employeeId) {
 
         log.info("inside create Employee service");
@@ -45,9 +53,9 @@ public class EmployeeService {
                 return  getEmployeeResponse;
             } else throw new CustomException(HttpStatus.NOT_FOUND, "no record found with employeeId: "+employeeId);
         }
-        catch (CustomException ex){
+        catch (DataAccessException | JDBCException ex){
             log.info(String.valueOf(ex));
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee record. employeeId: "+employeeId);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee list");
         }
     }
 
@@ -104,6 +112,7 @@ public class EmployeeService {
         return employeeRepository.existsByEmail(email);
     }
 
+    @Transactional
     public UpdateEmployeeResponse updateEmployee(String employeeId, UpdateEmployeeRequest newUpdateEmployeeDTO) {
         log.info("inside updateEmployee service");
         Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
