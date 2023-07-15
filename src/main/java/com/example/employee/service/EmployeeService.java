@@ -131,7 +131,8 @@ public class EmployeeService {
             }
 
             Employee updateEmployee = employeeRepository.save(existingEmployee);
-            UpdateEmployeeResponse getEmployeeResponse = modelMapper.map(updateEmployee, UpdateEmployeeResponse.class);
+            UpdateEmployeeResponse getEmployeeResponse;
+            getEmployeeResponse = modelMapper.map(updateEmployee, UpdateEmployeeResponse.class);
 
             // Save the updated employee to the database
             return getEmployeeResponse;
