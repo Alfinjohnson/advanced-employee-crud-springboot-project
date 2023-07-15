@@ -9,6 +9,7 @@ import com.example.employee.service.EmployeeService;
 import com.example.employee.utility.ApiResponse;
 import com.example.employee.utility.expectionHandler.CustomException;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,7 @@ public class EmployeeController {
      * @param id 
      * @return GetEmployeeResponse
      */
+    @NonNull
     @GetMapping("/{id}")
     private ResponseEntity<ApiResponse<GetEmployeeResponse>> getEmployeeById(@PathVariable String id) {
         log.info("inside get all get employees by id controller");
@@ -94,6 +96,7 @@ public class EmployeeController {
      * @param updateEmployeeRequest
      * @return
      */
+    @NonNull
     @PutMapping("/{id}")
     private ResponseEntity<ApiResponse<UpdateEmployeeResponse>> updateEmployee(@PathVariable String id, @RequestBody UpdateEmployeeRequest updateEmployeeRequest) {
         log.info("inside update employee controller");
@@ -109,10 +112,18 @@ public class EmployeeController {
     }
 
 
-
+    /**
+     * @param id
+     * @return
+     */
+    @NonNull
     @DeleteMapping("/{id}")
-    private void deleteEmployee() {
+    private ResponseEntity<Void> deleteEmployee(@PathVariable String id) {
+        log.info("inside delete employee controller");
+        final boolean isEmployeeIdNullOrEmptyOrBlank = isStringNullOrEmptyOrBlank(id);
+        if (isEmployeeIdNullOrEmptyOrBlank) throw new CustomException(HttpStatus.BAD_REQUEST, "Employee Id can't be null or empty");
+        if (!isValidAlphaNumeric(id)) throw new CustomException(HttpStatus.BAD_REQUEST, "Employee Id format not valid");
+        if (!employeeService.delete(id))throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed delete employee:n"+id);
+        return ResponseEntity.noContent().build();
     }
-
-
 }

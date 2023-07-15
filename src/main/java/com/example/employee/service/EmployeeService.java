@@ -55,7 +55,7 @@ public class EmployeeService {
         }
         catch (DataAccessException | JDBCException ex){
             log.info(String.valueOf(ex));
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee list");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee record");
         }
     }
 
@@ -82,8 +82,20 @@ public class EmployeeService {
         }
     }
 
-    public void delete(Employee employee) {
-
+    public boolean delete(String employeeId) {
+        Optional<Employee> getEmployeeList = employeeRepository.findById(employeeId);
+        try {
+         if (getEmployeeList.isPresent()) {
+            Employee employee = getEmployeeList.get();
+            log.info("Employees found {}",getEmployeeList);
+            employeeRepository.delete(employee);
+            return true;
+        } else throw new CustomException(HttpStatus.NOT_FOUND, "no record found with employeeId: "+employeeId);
+        }
+        catch (DataAccessException | JDBCException ex){
+        log.info(String.valueOf(ex));
+        throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to delete employee");
+        }
     }
 
     public List<GetEmployeeResponse> findAll() {
