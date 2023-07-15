@@ -1,7 +1,5 @@
 FROM eclipse-temurin:17-jdk-alpine
 VOLUME /tmp
-ARG employee-crud
 COPY target/employee-crud-0.0.1-SNAPSHOT.jar app.jar
-ENV DB_URL=jdbc:postgresql://localhost:5432/employee_db
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app.jar","--spring.profiles.active=docker"]
