@@ -68,7 +68,17 @@
         </dependency>
 
     </dependencies>
-
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>docker</id>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>
