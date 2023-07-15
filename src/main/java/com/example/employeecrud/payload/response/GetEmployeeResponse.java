@@ -7,7 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class GetAllEmployeeResponse {
+public class GetEmployeeResponse {
+
+    private String employeeId;
 
     private String employeeName;
 

@@ -3,6 +3,7 @@ package com.example.employeecrud.service;
 import com.example.employeecrud.entity.Employee;
 import com.example.employeecrud.payload.request.CreateEmployeeRequest;
 import com.example.employeecrud.payload.response.CreateEmployeeResponse;
+import com.example.employeecrud.payload.response.GetEmployeeResponse;
 import com.example.employeecrud.repository.EmployeeRepository;
 import com.example.employeecrud.utility.expectionHandler.CustomException;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +12,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
+import org.modelmapper.ModelMapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j(topic = "EmployeeService")
@@ -24,8 +25,26 @@ public class EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    public Optional<Employee> findById(Long id) {
-        return null;
+    @Autowired
+    private ModelMapper modelMapper;
+    public GetEmployeeResponse findById(String employeeId) {
+
+        log.info("inside create Employee service");
+        try {
+            Optional<Employee> getEmployeeList = employeeRepository.findById(employeeId);
+
+            if (getEmployeeList.isPresent()) {
+                Employee employee = getEmployeeList.get();
+                log.info("Employees found {}",getEmployeeList);
+                // calling mapper class map to DTO Class GetEmployeeResponse
+                GetEmployeeResponse getEmployeeResponse = modelMapper.map(employee, GetEmployeeResponse.class);
+                return  getEmployeeResponse;
+            } else throw new CustomException(HttpStatus.NOT_FOUND, "no record found with employeeId: "+employeeId);
+        }
+        catch (CustomException ex){
+            log.info(String.valueOf(ex));
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee record. employeeId: "+employeeId);
+        }
     }
 
     public CreateEmployeeResponse createEmployee(@NonNull CreateEmployeeRequest createEmployeeRequest) {
@@ -55,13 +74,17 @@ public class EmployeeService {
 
     }
 
-    public List<Employee> findAll() {
+    public List<GetEmployeeResponse> findAll() {
         log.info("inside create Employee service");
         try {
             List<Employee> getEmployeeList = employeeRepository.findAll();
             if (getEmployeeList.isEmpty()) throw new CustomException(HttpStatus.NOT_FOUND, "no employees found");
             log.info("Employees found {}",getEmployeeList);
-            return getEmployeeList;
+            // calling mapper class map to DTO Class GetAllEmployeeResponse
+            List<GetEmployeeResponse> getEmployeeListResponse = getEmployeeList.stream()
+                    .map(employee -> modelMapper.map(employee, GetEmployeeResponse.class))
+                    .collect(Collectors.toList());
+            return getEmployeeListResponse;
         }catch (EmptyResultDataAccessException ex){
             log.info(String.valueOf(ex));
             throw new CustomException(HttpStatus.NOT_FOUND,"no employees found");
