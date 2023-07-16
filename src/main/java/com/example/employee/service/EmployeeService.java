@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 
 import static com.example.employee.utility.APPConst.*;
 
+/**
+ * @apiNote employee service
+ */
 @Service
 @Slf4j(topic = "EmployeeService")
 public class EmployeeService {
@@ -40,27 +43,27 @@ public class EmployeeService {
     }
 
     public GetEmployeeResponse findById(String employeeId) {
-
-        log.info("inside create Employee service");
+        log.info("inside create Employee service, employee Id: {}", employeeId);
         try {
             Optional<Employee> getEmployeeList = employeeRepository.findById(employeeId);
-
             if (getEmployeeList.isPresent()) {
                 Employee employee = getEmployeeList.get();
                 log.info("Employees found {}",getEmployeeList);
                 // calling mapper class map to DTO Class GetEmployeeResponse
                 GetEmployeeResponse getEmployeeResponse = modelMapper.map(employee, GetEmployeeResponse.class);
-                return  getEmployeeResponse;
+                log.debug("GetEmployeeResponse DTO {}",getEmployeeResponse);
+                return getEmployeeResponse;
             } else throw new CustomException(HttpStatus.NOT_FOUND, "no record found with employeeId: "+employeeId);
         }
         catch (DataAccessException | JDBCException ex){
-            log.info(String.valueOf(ex));
+            log.error("error at findById employee service ",ex);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee record");
         }
     }
 
+    @NonNull
     public CreateEmployeeResponse createEmployee(@NonNull CreateEmployeeRequest createEmployeeRequest) {
-        log.info("inside create Employee service");
+        log.info("inside create Employee service, {}",createEmployeeRequest);
         if(isEmailAlreadyExists(createEmployeeRequest.getEmail())) throw new CustomException(HttpStatus.BAD_REQUEST, "Employee Email already exist in record");
 
         try {
@@ -76,13 +79,16 @@ public class EmployeeService {
             log.info("created EmployeeId {}",buildEmployee.getEmployeeId());
             CreateEmployeeResponse createEmployeeResponse = new CreateEmployeeResponse();
             createEmployeeResponse.setEmployeeId(buildEmployee.getEmployeeId());
+            log.debug("createEmployeeResponse {}",createEmployeeResponse);
             return createEmployeeResponse;
         } catch (CustomException ex) {
+          log.error("error at createEmployee service",ex);
            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to save employee");
         }
     }
 
     public boolean delete(String employeeId) {
+        log.info("inside the delete employee service, employee Id: {}",employeeId);
         Optional<Employee> getEmployeeList = employeeRepository.findById(employeeId);
         try {
          if (getEmployeeList.isPresent()) {
@@ -93,7 +99,7 @@ public class EmployeeService {
         } else throw new CustomException(HttpStatus.NOT_FOUND, "no record found with employeeId: "+employeeId);
         }
         catch (DataAccessException | JDBCException ex){
-        log.info(String.valueOf(ex));
+        log.error("error at delete employee service",ex);
         throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to delete employee");
         }
     }
@@ -105,16 +111,18 @@ public class EmployeeService {
             if (getEmployeeList.isEmpty()) throw new CustomException(HttpStatus.NOT_FOUND, "no employees found");
             log.info("Employees found {}",getEmployeeList);
             // calling mapper class map to DTO Class GetAllEmployeeResponse
-            List<GetEmployeeResponse> getEmployeeListResponse = getEmployeeList.stream()
+            List<GetEmployeeResponse> getEmployeeListResponse;
+            getEmployeeListResponse = getEmployeeList.stream()
                     .map(employee -> modelMapper.map(employee, GetEmployeeResponse.class))
                     .collect(Collectors.toList());
+            log.debug("getEmployeeListResponse: {}",getEmployeeListResponse);
             return getEmployeeListResponse;
         }catch (EmptyResultDataAccessException ex){
-            log.info(String.valueOf(ex));
+            log.error("EmptyResultDataAccessException error at findAll employee service ",ex);
             throw new CustomException(HttpStatus.NOT_FOUND,"no employees found");
         }
         catch (NullPointerException | DataAccessException ex){
-            log.info(String.valueOf(ex));
+            log.error("NullPointerException or DataAccessException error at findAll employee service ",ex);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"Failed to fetch employee list");
         }
     }
@@ -126,12 +134,12 @@ public class EmployeeService {
 
     @Transactional
     public UpdateEmployeeResponse updateEmployee(String employeeId, UpdateEmployeeRequest newUpdateEmployeeDTO) {
-        log.info("inside updateEmployee service");
+        log.info("inside updateEmployee service, employee id: {}, UpdateEmployeeRequest: {} ",employeeId,newUpdateEmployeeDTO);
         Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
 
         if (optionalEmployee.isPresent()) {
             Employee existingEmployee = optionalEmployee.get();
-
+            log.debug("employee found, existingEmployee: {}",existingEmployee);
 
             if (!isStringNullOrEmptyOrBlank(newUpdateEmployeeDTO.getEmployeeName())){
                 existingEmployee.setEmployeeName(newUpdateEmployeeDTO.getEmployeeName());
@@ -150,14 +158,12 @@ public class EmployeeService {
             if (!isArrayNullOrEmpty(newUpdateEmployeeDTO.getDegreeDetails())){
                 existingEmployee.setDegreeDetails(newUpdateEmployeeDTO.getDegreeDetails());
             }
-
+            // Saving the updated employee to the database
             Employee updateEmployee = employeeRepository.save(existingEmployee);
             UpdateEmployeeResponse getEmployeeResponse;
             getEmployeeResponse = modelMapper.map(updateEmployee, UpdateEmployeeResponse.class);
-
-            // Save the updated employee to the database
+            log.debug("updateEmployee, getEmployeeResponse: {}",getEmployeeResponse);
             return getEmployeeResponse;
         } else throw new CustomException(HttpStatus.NOT_FOUND,"no record found with employeeId: "+employeeId);
-
     }
 }

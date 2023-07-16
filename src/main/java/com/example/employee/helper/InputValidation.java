@@ -11,7 +11,7 @@ import static com.example.employee.utility.APPConst.*;
 import static com.example.employee.utility.APPConst.isArrayOfStringsAlphabetic;
 
 /**
- *
+ * @apiNote input validation class
  */
 @Slf4j(topic = "InputValidation")
 public final class InputValidation {
@@ -20,7 +20,7 @@ public final class InputValidation {
      */
     @NonNull
     public static CreateEmployeeRequest createEmployeeRequestValidationMethod(@NonNull CreateEmployeeRequest createEmployeeRequest) {
-
+        log.info("inside the create employee validation method");
         final String employeeName = createEmployeeRequest.getEmployeeName();
         final String employeeAge = createEmployeeRequest.getAge();
         final String employeeEmail = createEmployeeRequest.getEmail();
@@ -45,7 +45,7 @@ public final class InputValidation {
         final boolean isDegreeDetailsNullOrEmptyOrBlank = isArrayNullOrEmpty(employeeDegreeDetails);
 
 
-        // creating a new employee request
+        // creating a new employee DTO
         CreateEmployeeRequest newCreateEmployeeRequest = new CreateEmployeeRequest();
 
         newCreateEmployeeRequest.setEmployeeName(employeeName);
@@ -66,10 +66,16 @@ public final class InputValidation {
             if (!isArrayOfStringsAlphabetic(employeeDegreeDetails))throw new CustomException(HttpStatus.BAD_REQUEST, "Employee DegreeDetails not valid");
             newCreateEmployeeRequest.setDegreeDetails(employeeDegreeDetails);
         }else newCreateEmployeeRequest.setDegreeDetails(new String[]{"NA"});
-
+        log.debug("newCreateEmployeeRequest {}", newCreateEmployeeRequest);
         return newCreateEmployeeRequest;
     }
 
+    /**
+     * @apiNote update employee validation method
+     * @param employeeId
+     * @param updateEmployeeRequest
+     * @return newUpdateEmployeeRequest
+     */
     @NonNull
     public static UpdateEmployeeRequest updateEmployeeRequestValidationMethod(String employeeId, UpdateEmployeeRequest updateEmployeeRequest) {
         log.info("inside update Employee validation method");
@@ -90,7 +96,7 @@ public final class InputValidation {
         final boolean isEmailNullOrEmptyOrBlank = isStringNullOrEmptyOrBlank(employeeEmail);
         final boolean isSalaryAmountNullOrEmptyOrBlank = isStringNullOrEmptyOrBlank(employeeSalaryAmount);
         final boolean isDegreeDetailsNullOrEmptyOrBlank = isArrayNullOrEmpty(employeeDegreeDetails);
-
+        // new UpdateEmployeeRequest DTO class
         UpdateEmployeeRequest newUpdateEmployeeRequest = new UpdateEmployeeRequest();
 
         if (!isEmployeeNameNullOrEmptyOrBlank){
@@ -113,6 +119,7 @@ public final class InputValidation {
             if (!isArrayOfStringsAlphabetic(employeeDegreeDetails)) throw new CustomException(HttpStatus.BAD_REQUEST, "Employee DegreeDetails not valid");
             newUpdateEmployeeRequest.setDegreeDetails(employeeDegreeDetails);
         }
+        log.debug("newUpdateEmployeeRequest {}", newUpdateEmployeeRequest);
         return newUpdateEmployeeRequest;
     }
 }

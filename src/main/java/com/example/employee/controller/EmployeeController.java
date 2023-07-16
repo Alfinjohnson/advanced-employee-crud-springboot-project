@@ -9,7 +9,6 @@ import com.example.employee.service.EmployeeService;
 import com.example.employee.utility.ApiResponse;
 import com.example.employee.utility.expectionHandler.CustomException;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +21,9 @@ import static com.example.employee.helper.InputValidation.createEmployeeRequestV
 import static com.example.employee.helper.InputValidation.updateEmployeeRequestValidationMethod;
 import static com.example.employee.utility.APPConst.*;
 
+/**
+ * employee reset controller
+ */
 @RestController
 @RequestMapping("/api/employees")
 @Slf4j(topic = "Employee Controller")
@@ -36,7 +38,8 @@ public class EmployeeController {
     }
 
     /**
-     * @apiNote  get all employee method
+     * @apiNote get all employee method
+     * @return GetEmployeeResponse
      * */
     @NonNull
     @GetMapping
@@ -52,6 +55,7 @@ public class EmployeeController {
     }
 
     /**
+     * @apiNote get employee by id controller
      * @param id 
      * @return GetEmployeeResponse
      */
@@ -113,6 +117,7 @@ public class EmployeeController {
 
 
     /**
+     * @apiNote delete employee controller
      * @param id
      * @return
      */

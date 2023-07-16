@@ -1,12 +1,16 @@
 package com.example.employee.payload.request;
 
 import lombok.*;
+
+/**
+ * @apiNote Update Employee Request payload
+ */
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UpdateEmployeeRequest {
+public final class UpdateEmployeeRequest {
 
         private String employeeName;
 
