@@ -3,6 +3,18 @@ The following was discovered as part of building this project:
 
 * The original package name 'com.example.employee-crud' is invalid and this project uses 'com.example.employee' instead.
 
+# Current Support
+
+* Docker
+* Multi spring boot profile
+* Custom response handler
+* Custom error handler
+* Rest API
+* logger
+* Sawgger UI
+* Spring security not added
+* Unit test not added
+
 # Getting Started
 
 # advanced-employee-crud-springboot-project
